@@ -88,13 +88,16 @@ class _ParentChildCheckboxState extends State<ParentChildCheckbox> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Checkbox(
-              value: _parentValue,
-              splashRadius: 0.0,
-              activeColor: widget.parentCheckboxColor,
-              shape: const CircleBorder(),
-              onChanged: (value) => _parentCheckBoxClick(),
-              tristate: false,
+            Transform.scale(
+              scale: 1.1,
+              child: Checkbox(
+                value: _parentValue,
+                splashRadius: 0.0,
+                activeColor: widget.parentCheckboxColor,
+                shape: const CircleBorder(),
+                onChanged: (value) => _parentCheckBoxClick(),
+                tristate: false,
+              ),
             ),
             Container(
               width: MediaQuery.of(context).size.width * 0.10,
