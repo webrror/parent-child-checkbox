@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selectable_container/selectable_container.dart';
 
 ///Main widget of Parent Child Checkbox.
 ///Parent Child Checkbox is a type of checkbox where we can establish hierarchy in Checkboxes.
@@ -80,44 +81,73 @@ class _ParentChildCheckboxState extends State<ParentChildCheckbox> {
 
   @override
   Widget build(BuildContext context) {
+    String customText = widget.parent!.data.toString().substring(0, 3);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Checkbox(
               value: _parentValue,
               splashRadius: 0.0,
               activeColor: widget.parentCheckboxColor,
+              shape: const CircleBorder(),
               onChanged: (value) => _parentCheckBoxClick(),
-              tristate: true,
+              tristate: false,
             ),
-            SizedBox(
-              width: 10.0,
+            Container(
+              width: MediaQuery.of(context).size.width * 0.10,
+              // height: MediaQuery.of(context).size.height * 0.08,
+              child: Center(
+                child: Text(
+                  customText.toUpperCase(),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
-            widget.parent!,
+            _parentValue!
+                ? Container(
+                    height: 70,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: widget.children!.length,
+                      scrollDirection: Axis.horizontal,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Center(
+                          child: SelectableContainer(
+                              selectedBorderColor: Colors.deepPurple[400],
+                              // to make tick icon invisible
+                              selectedBackgroundColorIcon: Colors.transparent,
+                              selectedBorderColorIcon: Colors.transparent,
+                              iconColor: Colors.transparent,
+                              //
+                              unselectedBorderColor: Colors.grey,
+                              selectedBackgroundColor:
+                                  Colors.deepPurple.withOpacity(0.2),
+                              borderSize: 1,
+                              selected: _childrenValue[index]!,
+                              onValueChanged: (value) {
+                                _childCheckBoxClick(index);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: widget.children![index],
+                              )),
+                        );
+                      },
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10.0,
+                      right: 10.0,
+                    ),
+                    child: Text('Unavailable'),
+                  )
           ],
         ),
-        SizedBox(
-          height: 10.0,
-        ),
-        for (int i = 0; i < widget.children!.length; i++)
-          Padding(
-            padding: EdgeInsets.only(left: 25.0),
-            child: Row(
-              children: [
-                Checkbox(
-                  splashRadius: 0.0,
-                  activeColor: widget.childrenCheckboxColor,
-                  value: _childrenValue[i],
-                  onChanged: (value) => _childCheckBoxClick(i),
-                ),
-                SizedBox(
-                  width: 10.0,
-                ),
-                widget.children![i],
-              ],
-            ),
-          ),
       ],
     );
   }
@@ -139,7 +169,7 @@ class _ParentChildCheckboxState extends State<ParentChildCheckbox> {
           return value;
         });
       }
-      _parentCheckboxUpdate();
+      //_parentCheckboxUpdate();
     });
   }
 
@@ -153,16 +183,17 @@ class _ParentChildCheckboxState extends State<ParentChildCheckbox> {
         ParentChildCheckbox._selectedChildrenMap.addAll({
           widget.parent!.data: [],
         });
-        for (int i = 0; i < widget.children!.length; i++) {
-          _childrenValue[i] = _parentValue;
-          if (_parentValue!) {
-            ParentChildCheckbox._selectedChildrenMap.update(widget.parent!.data,
-                (value) {
-              value.add(widget.children![i].data);
-              return value;
-            });
-          }
-        }
+        // Not needed by me
+        // for (int i = 0; i < widget.children!.length; i++) {
+        //_childrenValue[i] = _parentValue;
+        // if (_parentValue!) {
+        //   ParentChildCheckbox._selectedChildrenMap.update(widget.parent!.data,
+        //       (value) {
+        //     value.add(widget.children![i].data);
+        //     return value;
+        //   });
+        // }
+        // }
       } else {
         _parentValue = false;
         ParentChildCheckbox._isParentSelected
@@ -175,18 +206,19 @@ class _ParentChildCheckboxState extends State<ParentChildCheckbox> {
     });
   }
 
+  // Not using
   ///Method to update the Parent Checkbox based on the status of Child checkbox
-  void _parentCheckboxUpdate() {
-    setState(() {
-      if (_childrenValue.contains(false) && _childrenValue.contains(true)) {
-        _parentValue = null;
-        ParentChildCheckbox._isParentSelected
-            .update(widget.parent!.data, (value) => false);
-      } else {
-        _parentValue = _childrenValue.first;
-        ParentChildCheckbox._isParentSelected
-            .update(widget.parent!.data, (value) => _childrenValue.first);
-      }
-    });
-  }
+  // void _parentCheckboxUpdate() {
+  //   setState(() {
+  //     if (_childrenValue.contains(false) && _childrenValue.contains(true)) {
+  //       _parentValue = true;
+  //       ParentChildCheckbox._isParentSelected
+  //           .update(widget.parent!.data, (value) => false);
+  //     } else {
+  //       _parentValue = _childrenValue.first;
+  //       ParentChildCheckbox._isParentSelected
+  //           .update(widget.parent!.data, (value) => _childrenValue.first);
+  //     }
+  //   });
+  // }
 }
